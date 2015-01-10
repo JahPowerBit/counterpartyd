@@ -437,6 +437,11 @@ def holders(db, asset):
         for execution in list(cursor):
             holders.append({'address': execution['source'], 'address_quantity': execution['gas_cost'], 'escrow': None})
 
+        # XCP escrowed for not finished executions
+        cursor.execute('''SELECT * FROM executions WHERE status = ?''', ('out of gas',))
+        for execution in list(cursor):
+            holders.append({'address': execution['source'], 'address_quantity': execution['gas_remained'], 'escrow': execution['contract_id']})
+
     cursor.close()
     return holders
 
